@@ -71,10 +71,8 @@ def readImage(img_file_path):
 	#############	Add your Code here	###############
 	originalImage=cv2.imread(img_file_path)
 	greyImage=cv2.cvtColor(originalImage,cv2.COLOR_BGR2GRAY)
-	binary_img=cv2.threshold(greyImage,120,255,cv2.THRESH_BINARY)
-	print (binary_img.shape)
-	#cv2.imshow("img",binary_img)
-	#cv2.waitKey(0)
+	threshold,binary_img=cv2.threshold(greyImage,120,255,cv2.THRESH_BINARY)
+	
 	
    	###################################################
 
