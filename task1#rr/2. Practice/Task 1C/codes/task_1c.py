@@ -42,24 +42,13 @@ import sys
 #################################################################
 
 
-# Function Name:	computeSum
-# Inputs: 			img_file_path [ file path of image ]
-# 					shortestPath [ list of coordinates of shortest path from initial_point to final_point ]
-# Outputs:			digits_list [ list of digits present in the maze image ]
-# 					digits_on_path [ list of digits present on the shortest path in the maze image ]
-# 					sum_of_digits_on_path [ sum of digits present on the shortest path in the maze image ]
-# Purpose: 			the function takes file path of original image and shortest path in the maze image
-# 					to return the list of digits present in the image, list of digits present on the shortest
-# 					path in the image and sum of digits present on the shortest	path in the image
-# Logic:			[ write the logic in short of how this function solves the purpose ]
-# Example call: 	digits_list, digits_on_path, sum_of_digits_on_path = computeSum(img_file_path, shortestPath)
-
 def computeSum(img_file_path, shortestPath):
 
 	"""
 	Purpose:
 	---
-	the function takes file path of original image and shortest path as argument and returns list of digits, digits on path and sum of digits on path
+	the function takes file path of original image and shortest path as argument and returns
+	list of digits in image, digits on path and sum of digits on path in the maze image
 
 	Input Arguments:
 	---
@@ -79,7 +68,7 @@ def computeSum(img_file_path, shortestPath):
 
 	Example call:
 	---
-	original_binary_img = readImage(img_file_path)
+	digits_list, digits_on_path, sum_of_digits_on_path = computeSum(img_file_path, shortestPath)
 
 	"""
 

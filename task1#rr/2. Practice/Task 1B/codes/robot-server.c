@@ -20,10 +20,12 @@
 /*
 * Team ID:			[ Team-ID ]
 * Author List:		[ Names of team members worked on this file separated by Comma: Name1, Name2, ... ]
-* Filename:			task_1a.py
-* Functions:		readImage, solveMaze
+* Filename:			robot-server.c
+* Functions:		socket_create, receive_from_send_to_client
 * 					[ Comma separated list of functions in this file ]
-* Global variables:	CELL_SIZE
+* Global variables:	SERVER_PORT, RX_BUFFER_SIZE, TX_BUFFER_SIZE, MAXCHAR,
+* 					dest_addr, source_addr, rx_buffer, tx_buffer,
+* 					ipv4_addr_str, ipv4_addr_str_client, listen_sock, line_data, input_fp, output_fp
 * 					[ List of global variables defined in this file ]
 */
 
@@ -107,6 +109,13 @@ int receive_from_send_to_client(int sock){
 }
 
 
+/*
+* Function Name:	main()
+* Inputs:			None
+* Outputs: 			None
+* Purpose: 			the function solves Task 1B problem statement by making call to
+* 					functions socket_create() and receive_from_send_to_client()
+*/
 int main() {
 	
     char *input_file_name = "obstacle_pos.txt";

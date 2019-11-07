@@ -43,11 +43,7 @@ SERVER_IP = '127.0.0.1'
 SERVER_PORT = 3333
 SERVER_ADDRESS = (SERVER_IP, SERVER_PORT)
 
-# file_num = 0
-# obstacle_list = []
-# obstacle_pos = 0
 
-##  Function that creates socket communication
 def connect_to_server(SERVER_ADDRESS):
 
 	"""
@@ -57,17 +53,17 @@ def connect_to_server(SERVER_ADDRESS):
 
 	Input Arguments:
 	---
-	`SERVER_ADDRESS` :		[ tuple ]
+	`SERVER_ADDRESS` :	[ tuple ]
 		port address of server
 
 	Returns:
 	---
-	`original_binary_img` :	[ numpy array ]
-		binary form of the original image at img_file_path
+	`sock` :	[ object of socket class ]
+		object of socket class for socket communication
 
 	Example call:
 	---
-	original_binary_img = readImage(img_file_path)
+	sock = connect_to_server(SERVER_ADDRESS)
 
 	"""
 
@@ -81,24 +77,40 @@ def connect_to_server(SERVER_ADDRESS):
 
 	return sock
 
-##  Function that sends and receives data from server
+
 def send_to_receive_from_server(sock, shortestPath):
+
+	"""
+	Purpose:
+	---
+	the function sends / receives data to / from server
+
+	Input Arguments:
+	---
+	`sock` :	[ object of socket class ]
+		object of socket class for socket communication
+	`shortestPath`	:	[ list ]
+		list of coordinates of shortest path from initial_point to final_point
+
+	Returns:
+	---
+	`sent_data` :	[ string ]
+		data sent from client to server in proper format
+	`recv_data` :	[ string ]
+		data sent from server to client in proper format
+
+	Example call:
+	---
+	sent_data, recv_data = send_to_receive_from_server(sock, shortestPath)
+
+	"""
 
 	sent_data = ''
 	recv_data = ''
 
 	#############  Add your Code here   ###############
 
-	sent_data = str(file_num) + '|' + '#' + str(shortestPath) + '#'
 	
-	# Send data
-	sock.sendall(sent_data.encode())
-
-	# Look for the response
-	# amount_received = 0
-	recv_data = sock.recv(1024) # earlier 128
-	recv_data = recv_data.decode()
-	# amount_received += len(recv_data)
 
 	###################################################
 
@@ -106,6 +118,34 @@ def send_to_receive_from_server(sock, shortestPath):
 
 ##  Function that computes new shortest path from cell adjacent to obstacle to final_point
 def find_new_path(recv_data, shortestPath):
+
+	"""
+	Purpose:
+	---
+	the function computes new shortest path from cell adjacent to obstacle to final_point
+
+	Input Arguments:
+	---
+	`recv_data` :	[ string ]
+		data sent from server to client in proper format
+	`shortestPath`	:	[ list ]
+		list of coordinates of shortest path from initial_point to final_point
+
+	Returns:
+	---
+	`obstacle_coord` :	[ tuple ]
+		position of dynamic obstacle in (x,y) coordinate
+	`new_shortestPath` :	[ list ]
+		list of coordinates of shortest path from new_initial_point to final_point
+	`new_initial_point` :	[ tuple ]
+		coordinate of cell adjacent to obstacle for the new shortest path
+	`img` :	[ numpy array ]
+
+	Example call:
+	---
+	obstacle_coord, new_shortestPath, new_initial_point, img = find_new_path(recv_data, shortestPath)
+
+	"""
 
 	obstacle_coord = ()
 	new_shortestPath = []
@@ -115,40 +155,7 @@ def find_new_path(recv_data, shortestPath):
 
 	#############  Add your Code here   ###############
 
-	open_brack_idx = recv_data.find('(')
-	comma_idx = recv_data.find(',')
-	close_brack_idx = recv_data.find(')')
-
-	if abs((open_brack_idx - comma_idx)) > 2:
-		obstacle_x = (int(recv_data[comma_idx-2]))*10 + (int(recv_data[comma_idx-1]))
-	else:
-		obstacle_x = (int(recv_data[comma_idx-1]))
 	
-	if abs((close_brack_idx - comma_idx)) > 2:
-		obstacle_y = (int(recv_data[comma_idx+1]))*10 + (int(recv_data[comma_idx+2]))
-	else:
-		obstacle_y = (int(recv_data[comma_idx+1]))
-	
-	obstacle_coord = (obstacle_x, obstacle_y)
-
-	obstacle_list.append(obstacle_x)
-	obstacle_list.append(obstacle_y)
-
-	# colour the cell as blocked at the obstacle's position
-	obstacle_index = shortestPath.index((obstacle_x, obstacle_y))
-	new_initial_point = shortestPath[obstacle_index-1] # (0, 0)                  # start coordinates of maze
-
-	img = task_1a.readImage(img_file_path)
-
-	obstacle_pos = 0
-
-	while obstacle_pos < len(obstacle_list):
-		# print(obstacle_pos, len(obstacle_list), obstacle_list[obstacle_pos], obstacle_list[obstacle_pos+1])
-		image_enhancer.colourCell(img, obstacle_list[obstacle_pos], obstacle_list[obstacle_pos+1], 0)
-		obstacle_pos = obstacle_pos + 2
-		# cv2.imshow('colored' + str(obstacle_pos), img)
-	
-	new_shortestPath = task_1a.solveMaze(img, new_initial_point, final_point, no_cells_height, no_cells_width)
 
 	###################################################
 
