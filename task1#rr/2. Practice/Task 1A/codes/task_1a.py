@@ -19,8 +19,8 @@
 '''
 
 
-# Team ID:			[ Team-ID ]
-# Author List:		[ Names of team members worked on this file separated by Comma: Name1, Name2, ... ]
+# Team ID:			[ 4695 ]
+# Author List:		[  Kartik ]
 # Filename:			task_1a.py
 # Functions:		readImage, solveMaze
 # 					[ Comma separated list of functions in this file ]
@@ -114,7 +114,13 @@ def solveMaze(original_binary_img, initial_point, final_point, no_cells_height, 
 	shortestPath = []
 
 	#############	Add your Code here	###############
-
+	source = initial_point
+	destination = final_point
+	high = no_cells_height
+	breadth = no_cells_width
+	image = original_binary_img
+	print(image,source,destination,high,breadth)
+	
 	
 
 	###################################################
