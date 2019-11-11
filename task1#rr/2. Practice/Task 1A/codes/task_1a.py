@@ -22,9 +22,9 @@
 # Team ID:			[ 4695 ]
 # Author List:		[  Kartik ]
 # Filename:			task_1a.py
-# Functions:		readImage, solveMaze
+# Functions:		readImage, solveMaze,incw,decw,inch,dech,isVisited,findValue
 # 					[ Comma separated list of functions in this file ]
-# Global variables:	CELL_SIZE
+# Global variables:	CELL_SIZE,shortestDict,visitedList,frountier,(h,w),destination
 # 					[ List of global variables defined in this file ]
 
 
@@ -41,6 +41,12 @@ import image_enhancer
 
 # Maze images in task_1a_images folder have cell size of 20 pixels
 CELL_SIZE = 20
+shortestDict = {}
+visitedList = []
+frountier = []
+h,w = 0,0
+destination = None
+
 
 
 def readImage(img_file_path):
@@ -114,14 +120,60 @@ def solveMaze(original_binary_img, initial_point, final_point, no_cells_height, 
 	shortestPath = []
 
 	#############	Add your Code here	###############
-	source = initial_point
-	destination = final_point
-	high = no_cells_height
-	breadth = no_cells_width
-	image = original_binary_img
-	print(image,source,destination,high,breadth)
+	original_binary_img=original_binary_img
+	(h,w)=initial_point
+	destination=final_point
+
+	frountier.append((h,w))
 	
-	
+	while len(frountier)>0:
+    
+		currentCell=frountier[0]
+		h,w=currentCell
+		if decw()==1:
+			w-=1
+			if isVisited()==1:
+				frountier.append((h,w))
+				shortestDict[(h,w)]=currentCell
+			w+=1
+
+		if incw()==1:
+			w+=1
+			if isVisited()==1:
+				frountier.append((h,w))
+				shortestDict[(h,w)]=currentCell
+			w-=1
+		if dech()==1:
+			h-=1
+			if isVisited()==1:
+				frountier.append((h,w))
+				shortestDict[(h,w)]=currentCell
+			h+=1
+		if inch()==1:
+			h+=1
+			if isVisited()==1:
+				frountier.append((h,w))
+				shortestDict[(h,w)]=currentCell
+			h-=1
+		
+		visitedList.append(currentCell)
+		del frountier[0]
+
+	item=destination
+	path=[]
+	c=0
+	while c==0:
+		path.append(item)
+		(x,y)=findValue(item)
+		if (x,y)!=(0,0):
+			item=(x,y)
+		else :
+			c=1
+	path.append((x,y))
+	z=len(path)-1
+	while z>=0:
+		shortestPath.append(path[z])
+		z-=1
 
 	###################################################
 	
@@ -129,7 +181,50 @@ def solveMaze(original_binary_img, initial_point, final_point, no_cells_height, 
 
 
 #############	You can add other helper functions here		#############
+def incw() :
+    x=np.mean(original_binary_img[(h+1)*CELL_SIZE-CELL_SIZE:(h+1)*CELL_SIZE,(w+1)*CELL_SIZE-2:(w+1)*CELL_SIZE])  # w inc
+    if x<30:
+        return 0
+    else :
+        return 1
+def decw ():
+    x=np.mean(original_binary_img[(h+1)*CELL_SIZE-CELL_SIZE:(h+1)*CELL_SIZE,(w+1)*CELL_SIZE-CELL_SIZE:(w+1)*CELL_SIZE-(CELL_SIZE-2)]) #w dec
+    if x<30:
+        return 0
+    else :
+        return 1
+def inch ():
+    x=np.mean(original_binary_img[(h+1)*CELL_SIZE-2:(h+1)*CELL_SIZE,(w+1)*CELL_SIZE-CELL_SIZE:(w+1)*CELL_SIZE]) #h inc
+    if x<30:
+        return 0
+    else :
+        return 1 
+def dech ():
+    x=np.mean(original_binary_img[(h+1)*CELL_SIZE-CELL_SIZE:(h+1)*CELL_SIZE-(CELL_SIZE-2),(w+1)*CELL_SIZE-CELL_SIZE:(w+1)*CELL_SIZE]) #h decc
+    if x<30:
+        return 0
+    else :
+        return 1
 
+def isVisited():
+    flag=0
+    i=0
+    while i<len(visitedList):
+        i+=1
+        if (h,w)==visitedList[i-1] :
+            flag=1
+            continue
+        
+    if flag==1:
+        return 0
+    else :
+        return 1
+#print(decw())
+def findValue(item):
+    for key,value in shortestDict.items():
+        if item==key :
+            return value
+    return 0  
 
 
 #########################################################################
@@ -174,7 +269,7 @@ if __name__ == '__main__':
 	try:
 
 		shortestPath = solveMaze(original_binary_img, initial_point, final_point, no_cells_height, no_cells_width)
-
+        
 		if len(shortestPath) > 2:
 
 			img = image_enhancer.highlightPath(original_binary_img, initial_point, final_point, shortestPath)
