@@ -20,11 +20,11 @@
 
 
 # Team ID:			[ 4695 ]
-# Author List:		[  Kartik ]
+# Author List:		[  Kartik ,Kapil]
 # Filename:			task_1a.py
 # Functions:		readImage, solveMaze,incw,decw,inch,dech,isVisited,findValue
 # 					[ Comma separated list of functions in this file ]
-# Global variables:	CELL_SIZE,shortestDict,visitedList,frountier,(h,w),destination
+# Global variables:	CELL_SIZE,shortestDict,visitedList,(h,w)
 # 					[ List of global variables defined in this file ]
 
 
@@ -43,11 +43,7 @@ import image_enhancer
 CELL_SIZE = 20
 shortestDict = {}
 visitedList = []
-frountier = []
-h,w = 0,0
-destination = None
-
-
+(h,w)=0,0
 
 def readImage(img_file_path):
 
@@ -78,8 +74,6 @@ def readImage(img_file_path):
 	originalImage=cv2.imread(img_file_path)
 	greyImage=cv2.cvtColor(originalImage,cv2.COLOR_BGR2GRAY)
 	threshold,binary_img=cv2.threshold(greyImage,120,255,cv2.THRESH_BINARY)
-	
-	
    	###################################################
 
 	return binary_img
@@ -121,13 +115,14 @@ def solveMaze(original_binary_img, initial_point, final_point, no_cells_height, 
 
 	#############	Add your Code here	###############
 	original_binary_img=original_binary_img
-	(h,w)=initial_point
+	global h,w
+	global visitedList
+	global shortestDict
 	destination=final_point
-
+	(h,w)=initial_point
+	frountier=[]
 	frountier.append((h,w))
-	
 	while len(frountier)>0:
-    
 		currentCell=frountier[0]
 		h,w=currentCell
 		if decw()==1:
@@ -140,6 +135,7 @@ def solveMaze(original_binary_img, initial_point, final_point, no_cells_height, 
 		if incw()==1:
 			w+=1
 			if isVisited()==1:
+				
 				frountier.append((h,w))
 				shortestDict[(h,w)]=currentCell
 			w-=1
@@ -176,7 +172,6 @@ def solveMaze(original_binary_img, initial_point, final_point, no_cells_height, 
 		z-=1
 
 	###################################################
-	
 	return shortestPath
 
 
@@ -213,13 +208,11 @@ def isVisited():
         i+=1
         if (h,w)==visitedList[i-1] :
             flag=1
-            continue
-        
+            continue   
     if flag==1:
         return 0
     else :
         return 1
-#print(decw())
 def findValue(item):
     for key,value in shortestDict.items():
         if item==key :
