@@ -71,9 +71,13 @@ def readImage(img_file_path):
 	binary_img = None
 
 	#############	Add your Code here	###############
+	print(img_file_path)
 	originalImage=cv2.imread(img_file_path)
 	greyImage=cv2.cvtColor(originalImage,cv2.COLOR_BGR2GRAY)
 	threshold,binary_img=cv2.threshold(greyImage,120,255,cv2.THRESH_BINARY)
+	'''cv2.show("img",binary_img)
+	cv2.waitKey(0)
+	cv2.distroyAllWindows()'''
    	###################################################
 
 	return binary_img
@@ -116,8 +120,10 @@ def solveMaze(original_binary_img, initial_point, final_point, no_cells_height, 
 	#############	Add your Code here	###############
 	original_binary_img=original_binary_img
 	global h,w
-	global visitedList
+	global visitedList 
+	visitedList=[]
 	global shortestDict
+	shortestDict={}
 	destination=final_point
 	(h,w)=initial_point
 	frountier=[]
@@ -177,6 +183,7 @@ def solveMaze(original_binary_img, initial_point, final_point, no_cells_height, 
 
 #############	You can add other helper functions here		#############
 def incw() :
+	
     x=np.mean(original_binary_img[(h+1)*CELL_SIZE-CELL_SIZE:(h+1)*CELL_SIZE,(w+1)*CELL_SIZE-2:(w+1)*CELL_SIZE])  # w inc
     if x<30:
         return 0
