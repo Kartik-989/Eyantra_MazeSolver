@@ -44,7 +44,6 @@ CELL_SIZE = 20
 shortestDict = {}
 visitedList = []
 (h,w)=0,0
-
 def readImage(img_file_path):
 
 	"""
@@ -75,9 +74,6 @@ def readImage(img_file_path):
 	originalImage=cv2.imread(img_file_path)
 	greyImage=cv2.cvtColor(originalImage,cv2.COLOR_BGR2GRAY)
 	threshold,binary_img=cv2.threshold(greyImage,120,255,cv2.THRESH_BINARY)
-	'''cv2.show("img",binary_img)
-	cv2.waitKey(0)
-	cv2.distroyAllWindows()'''
    	###################################################
 
 	return binary_img
@@ -118,7 +114,7 @@ def solveMaze(original_binary_img, initial_point, final_point, no_cells_height, 
 	shortestPath = []
 
 	#############	Add your Code here	###############
-	original_binary_img=original_binary_img
+	binary_img=original_binary_img
 	global h,w
 	global visitedList 
 	visitedList=[]
@@ -131,27 +127,27 @@ def solveMaze(original_binary_img, initial_point, final_point, no_cells_height, 
 	while len(frountier)>0:
 		currentCell=frountier[0]
 		h,w=currentCell
-		if decw()==1:
+		if decw(binary_img)==1:
 			w-=1
 			if isVisited()==1:
 				frountier.append((h,w))
 				shortestDict[(h,w)]=currentCell
 			w+=1
 
-		if incw()==1:
+		if incw(binary_img)==1:
 			w+=1
 			if isVisited()==1:
 				
 				frountier.append((h,w))
 				shortestDict[(h,w)]=currentCell
 			w-=1
-		if dech()==1:
+		if dech(binary_img)==1:
 			h-=1
 			if isVisited()==1:
 				frountier.append((h,w))
 				shortestDict[(h,w)]=currentCell
 			h+=1
-		if inch()==1:
+		if inch(binary_img)==1:
 			h+=1
 			if isVisited()==1:
 				frountier.append((h,w))
@@ -182,27 +178,27 @@ def solveMaze(original_binary_img, initial_point, final_point, no_cells_height, 
 
 
 #############	You can add other helper functions here		#############
-def incw() :
+def incw(binary_img) :
 	
-    x=np.mean(original_binary_img[(h+1)*CELL_SIZE-CELL_SIZE:(h+1)*CELL_SIZE,(w+1)*CELL_SIZE-2:(w+1)*CELL_SIZE])  # w inc
+    x=np.mean(binary_img[(h+1)*CELL_SIZE-CELL_SIZE:(h+1)*CELL_SIZE,(w+1)*CELL_SIZE-2:(w+1)*CELL_SIZE])  # w inc
     if x<30:
         return 0
     else :
         return 1
-def decw ():
-    x=np.mean(original_binary_img[(h+1)*CELL_SIZE-CELL_SIZE:(h+1)*CELL_SIZE,(w+1)*CELL_SIZE-CELL_SIZE:(w+1)*CELL_SIZE-(CELL_SIZE-2)]) #w dec
+def decw (binary_img):
+    x=np.mean(binary_img[(h+1)*CELL_SIZE-CELL_SIZE:(h+1)*CELL_SIZE,(w+1)*CELL_SIZE-CELL_SIZE:(w+1)*CELL_SIZE-(CELL_SIZE-2)]) #w dec
     if x<30:
         return 0
     else :
         return 1
-def inch ():
-    x=np.mean(original_binary_img[(h+1)*CELL_SIZE-2:(h+1)*CELL_SIZE,(w+1)*CELL_SIZE-CELL_SIZE:(w+1)*CELL_SIZE]) #h inc
+def inch (binary_img):
+    x=np.mean(binary_img[(h+1)*CELL_SIZE-2:(h+1)*CELL_SIZE,(w+1)*CELL_SIZE-CELL_SIZE:(w+1)*CELL_SIZE]) #h inc
     if x<30:
         return 0
     else :
         return 1 
-def dech ():
-    x=np.mean(original_binary_img[(h+1)*CELL_SIZE-CELL_SIZE:(h+1)*CELL_SIZE-(CELL_SIZE-2),(w+1)*CELL_SIZE-CELL_SIZE:(w+1)*CELL_SIZE]) #h decc
+def dech (binary_img):
+    x=np.mean(binary_img[(h+1)*CELL_SIZE-CELL_SIZE:(h+1)*CELL_SIZE-(CELL_SIZE-2),(w+1)*CELL_SIZE-CELL_SIZE:(w+1)*CELL_SIZE]) #h decc
     if x<30:
         return 0
     else :

@@ -86,8 +86,15 @@ int socket_create(struct sockaddr_in dest_addr, struct sockaddr_in source_addr){
 	ip_protocol = IPPROTO_IP;
 
 	int my_sock;
-
-
+	my_sock=socket(AF_INET,SOCK_STREAM,0);
+	if(my_sock==-1){
+		printf("socket failed\n");
+		exit(-1);
+		}
+	if((bind(my_sock,(struct sockaddr *)&source_addr,sizeof(source_addr)))==-1) {
+		printf(" error in bind \n");
+		exit(-1);
+	}
 
 	return my_sock;
 }
@@ -103,6 +110,15 @@ int socket_create(struct sockaddr_in dest_addr, struct sockaddr_in source_addr){
 * Example call: 	receive_from_send_to_client(sock);
 */
 int receive_from_send_to_client(int sock){
+	int connfd;
+
+	if(listen(sock,1)==-1){
+		printf("failed to listen\n");
+	}
+	connfd=accept(sock,(struct sockaddr *)NULL,NULL);
+	if(connfd<0){
+		printf("server acceptfailed\n");
+	}
 
 	return 0;
 
