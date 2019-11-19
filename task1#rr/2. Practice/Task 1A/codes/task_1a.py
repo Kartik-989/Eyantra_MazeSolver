@@ -70,7 +70,6 @@ def readImage(img_file_path):
 	binary_img = None
 
 	#############	Add your Code here	###############
-	print(img_file_path)
 	originalImage=cv2.imread(img_file_path)
 	greyImage=cv2.cvtColor(originalImage,cv2.COLOR_BGR2GRAY)
 	threshold,binary_img=cv2.threshold(greyImage,120,255,cv2.THRESH_BINARY)
@@ -114,40 +113,42 @@ def solveMaze(original_binary_img, initial_point, final_point, no_cells_height, 
 	shortestPath = []
 
 	#############	Add your Code here	###############
-	binary_img=original_binary_img
+	img=original_binary_img
+
 	global h,w
 	global visitedList 
-	visitedList=[]
+	visitedList=[]        #store list of visited co-ordinates
 	global shortestDict
-	shortestDict={}
+	shortestDict={}       #store path as key and value for reverse traversing 
 	destination=final_point
 	(h,w)=initial_point
-	frountier=[]
+	frountier=[]         #store co-ordinates to be visited next and work as queue
 	frountier.append((h,w))
+	######## main programe to traverse the whole maze###############
 	while len(frountier)>0:
-		currentCell=frountier[0]
+		currentCell=frountier[0]      
 		h,w=currentCell
-		if decw(binary_img)==1:
+		if decw(img)==1:                     
 			w-=1
 			if isVisited()==1:
 				frountier.append((h,w))
 				shortestDict[(h,w)]=currentCell
 			w+=1
 
-		if incw(binary_img)==1:
+		if incw(img)==1:
 			w+=1
 			if isVisited()==1:
 				
 				frountier.append((h,w))
 				shortestDict[(h,w)]=currentCell
 			w-=1
-		if dech(binary_img)==1:
+		if dech(img)==1:
 			h-=1
 			if isVisited()==1:
 				frountier.append((h,w))
 				shortestDict[(h,w)]=currentCell
 			h+=1
-		if inch(binary_img)==1:
+		if inch(img)==1:
 			h+=1
 			if isVisited()==1:
 				frountier.append((h,w))
@@ -158,16 +159,18 @@ def solveMaze(original_binary_img, initial_point, final_point, no_cells_height, 
 		del frountier[0]
 
 	item=destination
-	path=[]
+################## 	 reverse traversing ########################
+	path=[]   #store path in list of touples from destination to source
 	c=0
 	while c==0:
 		path.append(item)
 		(x,y)=findValue(item)
-		if (x,y)!=(0,0):
+		if (x,y)!=(initial_point):
 			item=(x,y)
 		else :
 			c=1
 	path.append((x,y))
+################ invert path[] OR make list of touples from source to destination############
 	z=len(path)-1
 	while z>=0:
 		shortestPath.append(path[z])
@@ -178,32 +181,37 @@ def solveMaze(original_binary_img, initial_point, final_point, no_cells_height, 
 
 
 #############	You can add other helper functions here		#############
-def incw(binary_img) :
+
+########## check width is increaseble OR there is a wall #############
+def incw(img) :
 	
-    x=np.mean(binary_img[(h+1)*CELL_SIZE-CELL_SIZE:(h+1)*CELL_SIZE,(w+1)*CELL_SIZE-2:(w+1)*CELL_SIZE])  # w inc
+    x=np.mean(img[(h+1)*CELL_SIZE-CELL_SIZE:(h+1)*CELL_SIZE,(w+1)*CELL_SIZE-2:(w+1)*CELL_SIZE])  # w inc
     if x<30:
         return 0
     else :
         return 1
-def decw (binary_img):
-    x=np.mean(binary_img[(h+1)*CELL_SIZE-CELL_SIZE:(h+1)*CELL_SIZE,(w+1)*CELL_SIZE-CELL_SIZE:(w+1)*CELL_SIZE-(CELL_SIZE-2)]) #w dec
+################# check width of maze is decreasable OR there is a wall #################
+def decw (img):
+    x=np.mean(img[(h+1)*CELL_SIZE-CELL_SIZE:(h+1)*CELL_SIZE,(w+1)*CELL_SIZE-CELL_SIZE:(w+1)*CELL_SIZE-(CELL_SIZE-2)]) #w dec
     if x<30:
         return 0
     else :
         return 1
-def inch (binary_img):
-    x=np.mean(binary_img[(h+1)*CELL_SIZE-2:(h+1)*CELL_SIZE,(w+1)*CELL_SIZE-CELL_SIZE:(w+1)*CELL_SIZE]) #h inc
+################### check hieght of maze is increasable OR there is a wall ##############
+def inch (img):
+    x=np.mean(img[(h+1)*CELL_SIZE-2:(h+1)*CELL_SIZE,(w+1)*CELL_SIZE-CELL_SIZE:(w+1)*CELL_SIZE]) #h inc
     if x<30:
         return 0
     else :
         return 1 
-def dech (binary_img):
-    x=np.mean(binary_img[(h+1)*CELL_SIZE-CELL_SIZE:(h+1)*CELL_SIZE-(CELL_SIZE-2),(w+1)*CELL_SIZE-CELL_SIZE:(w+1)*CELL_SIZE]) #h decc
+############### check hieght of maze is decreasable OR there is a wall ##################3
+def dech (img):
+    x=np.mean(img[(h+1)*CELL_SIZE-CELL_SIZE:(h+1)*CELL_SIZE-(CELL_SIZE-2),(w+1)*CELL_SIZE-CELL_SIZE:(w+1)*CELL_SIZE]) #h decc
     if x<30:
         return 0
     else :
         return 1
-
+################check if current cell is visited before OR not############################
 def isVisited():
     flag=0
     i=0
@@ -216,6 +224,8 @@ def isVisited():
         return 0
     else :
         return 1
+#############  finding value of key  from  dictionary datatype#############
+
 def findValue(item):
     for key,value in shortestDict.items():
         if item==key :

@@ -18,14 +18,16 @@
 */
 
 /*
-* Team ID:			[ Team-ID ]
-* Author List:		[ Names of team members worked on this file separated by Comma: Name1, Name2, ... ]
+* Team ID:			[ 4695 ]
+* Author List:		[ Kartik,Kapil ]
 * Filename:			robot-server.c
 * Functions:		socket_create, receive_from_send_to_client
 * 					[ Comma separated list of functions in this file ]
 * Global variables:	SERVER_PORT, RX_BUFFER_SIZE, TX_BUFFER_SIZE, MAXCHAR,
 * 					dest_addr, source_addr, rx_buffer, tx_buffer,
-* 					ipv4_addr_str, ipv4_addr_str_client, listen_sock, line_data, input_fp, output_fp
+* 					ipv4_addr_str, ipv4_addr_str_client, listen_sock, line_data, input_fp, output_fp,
+*					ptr
+
 * 					[ List of global variables defined in this file ]
 */
 
@@ -64,6 +66,7 @@ int listen_sock;
 char line_data[MAXCHAR];
 
 FILE *input_fp, *output_fp;
+int ptr=2;
 
 
 /*
@@ -75,9 +78,11 @@ FILE *input_fp, *output_fp;
 * Example call: 	int sock = socket_create(dest_addr, source_addr);
 */
 int socket_create(struct sockaddr_in dest_addr, struct sockaddr_in source_addr){
-
+	int my_sock;
+	int sock;
 	int addr_family;
 	int ip_protocol;
+	int len;
 
 	dest_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	dest_addr.sin_family = AF_INET;
@@ -85,17 +90,36 @@ int socket_create(struct sockaddr_in dest_addr, struct sockaddr_in source_addr){
 	addr_family = AF_INET;
 	ip_protocol = IPPROTO_IP;
 
-	int my_sock;
-	my_sock=socket(AF_INET,SOCK_STREAM,0);
-	if(my_sock==-1){
-		printf("socket failed\n");
-		exit(-1);
-		}
-	if((bind(my_sock,(struct sockaddr *)&source_addr,sizeof(source_addr)))==-1) {
-		printf(" error in bind \n");
-		exit(-1);
+	sock=socket(addr_family,SOCK_STREAM,ip_protocol);  //creating a socket 
+	
+	if(sock==-1){
+		printf("socket error\n");
 	}
-
+	else{
+		printf("socket created\n");
+	}
+	/*******  binding socket to an adderress   *********/
+	if((bind(sock,(struct sockaddr*)&dest_addr,sizeof(dest_addr)))==-1){
+		printf("socket binded error \n");
+	}
+	else {
+		printf("socket binded\n");
+	}
+	/********* listning for client ********/
+	if(listen(sock,5)==-1){
+		printf("lisning error\n");
+	}
+	else {
+		printf("listning for client\n");	
+	}
+	/**********  Accept request from client ************/
+    len=sizeof(source_addr);
+	my_sock=accept(sock,(struct sockaddr*)&source_addr,&len);
+	if(my_sock!=-1){
+		printf("  accepted\n" );
+		
+	}
+	
 	return my_sock;
 }
 
@@ -110,16 +134,108 @@ int socket_create(struct sockaddr_in dest_addr, struct sockaddr_in source_addr){
 * Example call: 	receive_from_send_to_client(sock);
 */
 int receive_from_send_to_client(int sock){
-	int connfd;
+	int x,y,length,flag=0,flagx=1,flagy=1;
+	/****** read recived data from client and put it into an buffer**********/
+	x=read(sock,rx_buffer,sizeof(rx_buffer));
+	if(x>0){
+    	printf("data recived %s\n",rx_buffer);
+		}
+		rewind(input_fp);
 
-	if(listen(sock,1)==-1){
-		printf("failed to listen\n");
+/******** to check the obstacle for a maze in file  and make required formet an send data to client********/
+	while(fgets(line_data, MAXCHAR, input_fp)!=NULL){
+		if(rx_buffer[0]==line_data[0]){
+			flag=1;
+			printf("%s\n%d\n",line_data,ptr);
+			length=strlen(line_data);
+			printf("%d",length);
+			if((line_data[ptr]=='\r')||(line_data[ptr]=='\n')){
+			
+				ptr=2;
+				char tx_buffer[]= "@$@";
+				y=write(sock,tx_buffer,sizeof(tx_buffer));
+					if(y>0){
+						printf("data sent1 %s\n",tx_buffer);
+						
+					}
+			}
+			else{
+				
+				while(line_data[ptr]!=')'){
+					ptr=ptr+1;
+					}
+				if(line_data[ptr-2]==','){
+					flagy=0;
+					}
+				if(flagy==0&&line_data[ptr-4]=='('){
+					flagx=0;
+					}
+				if(flagy==1&&line_data[ptr-5]=='('){
+					flagx==0;
+					}
+				
+				if(flagx==0&&flagy==0){
+					char tx_buffer[]="@( , )@";
+					tx_buffer[2]=line_data[ptr-3];
+					tx_buffer[4]=line_data[ptr-1];
+					y=write(sock,tx_buffer,sizeof(tx_buffer));
+					if(y>0){
+						printf("data sent2 %s\n",tx_buffer);
+					}
+				}
+
+				else if(flagx==1&&flagy==0){
+					char tx_buffer[]="@(  , )@";
+					tx_buffer[2]=line_data[ptr-4];
+					tx_buffer[3]=line_data[ptr-3];
+					tx_buffer[5]=line_data[ptr-1];
+					y=write(sock,tx_buffer,sizeof(tx_buffer));
+					if(y>0){
+						printf("data sent2 %s\n",tx_buffer);
+					}
+				}
+
+				else if (flagx==0&&flagy==1){
+					char tx_buffer[]="@( ,  )@";
+					tx_buffer[2]=line_data[ptr-4];
+					tx_buffer[4]=line_data[ptr-2];
+					tx_buffer[5]=line_data[ptr-1];
+					y=write(sock,tx_buffer,sizeof(tx_buffer));
+					if(y>0){
+						printf("data sent2 %s\n",tx_buffer);
+					}
+				}
+
+				else if(flagx==1&&flagy==1){
+					 char tx_buffer[]="@(  ,  )@";
+					tx_buffer[2]=line_data[ptr-5];
+					tx_buffer[3]=line_data[ptr-4];
+					tx_buffer[5]=line_data[ptr-2];
+					tx_buffer[6]=line_data[ptr-1];
+					y=write(sock,tx_buffer,sizeof(tx_buffer));
+					if(y>0){
+						printf("data sent2 %s\n",tx_buffer);
+					}
+				}
+					
+				
+				ptr=ptr+1;
+				
+			}
+			break;
+
+		}
 	}
-	connfd=accept(sock,(struct sockaddr *)NULL,NULL);
-	if(connfd<0){
-		printf("server acceptfailed\n");
+	if(flag==0){	
+	char tx_buffer[]="@$@";
+    y=write(sock,tx_buffer,sizeof(tx_buffer));
+	if(y>0){
+		printf("data sent3 %s\n",tx_buffer);
 	}
 
+	}
+	
+	
 	return 0;
 
 }
@@ -133,20 +249,19 @@ int receive_from_send_to_client(int sock){
 * 					functions socket_create() and receive_from_send_to_client()
 */
 int main() {
-	
     char *input_file_name = "obstacle_pos.txt";
 	char *output_file_name = "data_from_client.txt";
 
 	// Create socket and accept connection from client
 	int sock = socket_create(dest_addr, source_addr);
-
+	
 	input_fp = fopen(input_file_name, "r");
 
 	if (input_fp == NULL){
 		printf("Could not open file %s\n",input_file_name);
 		return 1;
 	}
-
+    
 	fgets(line_data, MAXCHAR, input_fp);
 
 	output_fp = fopen(output_file_name, "w");
@@ -157,7 +272,7 @@ int main() {
 	}
 
 	while (1) {
-
+       
 		// Receive and send data from client and get the new shortest path
 		receive_from_send_to_client(sock);
 

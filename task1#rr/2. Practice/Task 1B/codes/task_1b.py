@@ -19,8 +19,8 @@
 '''
 
 
-# Team ID:			[ Team-ID ]
-# Author List:		[ Names of team members worked on this file separated by Comma: Name1, Name2, ... ]
+# Team ID:			[ 4695 ]
+# Author List:		[ Kartik,Kapil ]
 # Filename:			task_1b.py
 # Functions:		connect_to_server, send_to_receive_from_server, find_new_path
 # 					[ Comma separated list of functions in this file ]
@@ -70,6 +70,8 @@ def connect_to_server(SERVER_ADDRESS):
 	sock = None
 	
 	#############  Add your Code here   ###############
+	sock = socket.socket()   ###making socket object
+	sock.connect(SERVER_ADDRESS)    ###connecting to socket
 
 	
 
@@ -109,8 +111,10 @@ def send_to_receive_from_server(sock, shortestPath):
 	recv_data = ''
 
 	#############  Add your Code here   ###############
-
-	
+	sent_data=str(file_num)+"|"+"#"+str(shortestPath)+"#"    ####making required fromat of data to send
+	sock.send(sent_data.encode())							#####encode data and send  to server
+	recv_data=sock.recv(1024)								####recieve data from server
+	recv_data=recv_data.decode()							######decode recived data
 
 	###################################################
 
@@ -154,6 +158,39 @@ def find_new_path(recv_data, shortestPath):
 	global img_file_path, final_point, no_cells_height, no_cells_width
 
 	#############  Add your Code here   ###############
+	#######   finding cell co-ordinates ######## 
+	open_brec=recv_data.find('(')
+	comma=recv_data.find(',')
+	close_brec=recv_data.find(')')
+	if abs((open_brec - comma)) > 2:
+		obstacle_x = (int(recv_data[comma-2]))*10 + (int(recv_data[comma-1]))
+	else:
+		obstacle_x = (int(recv_data[comma-1]))
+	
+	if abs((close_brec - comma)) > 2:
+		obstacle_y = (int(recv_data[comma+1]))*10 + (int(recv_data[comma+2]))
+	else:
+		obstacle_y = (int(recv_data[comma+1]))
+	obstacle_coord=(obstacle_x,obstacle_y)
+	obstacle_list.append(obstacle_x)
+	obstacle_list.append(obstacle_y)
+
+	indx_obstacle=shortestPath.index((obstacle_x,obstacle_y))
+	new_initial_point=shortestPath[indx_obstacle-1]
+
+	img=task_1a.readImage(img_file_path)
+
+	obstacle_pos=0 
+
+	######## to color the obstacle cell and find new shortest path ########
+	while obstacle_pos<len(obstacle_list):
+		image_enhancer.colourCell(img, obstacle_list[obstacle_pos], obstacle_list[obstacle_pos+1], 0)
+		obstacle_pos=obstacle_pos+2
+
+	new_shortestPath=task_1a.solveMaze(img,new_initial_point,final_point,no_cells_height,no_cells_width)
+	
+
+	
 
 	
 
