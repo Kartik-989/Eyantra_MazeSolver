@@ -19,8 +19,8 @@
 '''
 
 
-# Team ID:			[ Team-ID ]
-# Author List:		[ Names of team members worked on this file separated by Comma: Name1, Name2, ... ]
+# Team ID:			[ 4695 ]
+# Author List:		[ Kartik]
 # Filename:			task_1c.py
 # Functions:		computeSum
 # 					[ Comma separated list of functions in this file ]
@@ -36,7 +36,8 @@ import sys
 
 
 #############	You can import other modules here	#############
-
+import matplotlib.pyplot as plt
+import modeltrain
 
 
 #################################################################
@@ -77,8 +78,23 @@ def computeSum(img_file_path, shortestPath):
 	sum_of_digits_on_path = 0
 
 	#############  Add your Code here   ###############
-
-	
+	cell_size = 40
+	h,w=(1,1)
+	image=cv2.imread(img_file_path)
+	grey_img=cv2.cvtColor(image,cv2.COLOR_BGR2GRAY) # binary to grey
+	threshold,img=cv2.threshold(grey_img,120,255,cv2.THRESH_BINARY_INV)
+	img=img[(h+1)*cell_size-cell_size+4:(h+1)*cell_size-4,(w+1)*cell_size-cell_size+4:(w+1)*cell_size-4]
+	print(img.shape)
+	plt.imshow(img, cmap="gray") # Import the image
+	plt.show()
+	img=cv2.resize(img,(28,28),interpolation=cv2.INTER_CUBIC)
+	img=img/255
+	print(img.shape)
+	plt.imshow(img, cmap="gray") # Import the image
+	plt.show()
+	image=img.reshape(-1,28,28)
+	print(image.shape)
+	modeltrain.predict(image)
 	
 	###################################################
 
