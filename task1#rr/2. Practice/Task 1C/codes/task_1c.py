@@ -37,10 +37,16 @@ import sys
 
 #############	You can import other modules here	#############
 import matplotlib.pyplot as plt
-import modeltrain
+import Load_Model
+import tensorflow as tf
 
 
-#################################################################
+###########################  Global Vriables  ##########################
+(h,w)=0,0
+cell_size=40
+digitvalue={}
+
+####################################################################
 
 
 def computeSum(img_file_path, shortestPath):
@@ -78,23 +84,112 @@ def computeSum(img_file_path, shortestPath):
 	sum_of_digits_on_path = 0
 
 	#############  Add your Code here   ###############
-	cell_size = 40
-	h,w=(1,1)
+	global h,w
+	global cell_size 
+	global digitvalue
+	shortestPath=shortestPath
+	no_cells_height=10
+	no_cells_width=10
+	digitcell=[]
+	cellon_path=[]
+	digitvalue={}
+	h,w=0,0
+	i,j=0,0
+	d=check = 0
 	image=cv2.imread(img_file_path)
 	grey_img=cv2.cvtColor(image,cv2.COLOR_BGR2GRAY) # binary to grey
+	
 	threshold,img=cv2.threshold(grey_img,120,255,cv2.THRESH_BINARY_INV)
-	img=img[(h+1)*cell_size-cell_size+4:(h+1)*cell_size-4,(w+1)*cell_size-cell_size+4:(w+1)*cell_size-4]
-	print(img.shape)
-	plt.imshow(img, cmap="gray") # Import the image
-	plt.show()
-	img=cv2.resize(img,(28,28),interpolation=cv2.INTER_CUBIC)
-	img=img/255
-	print(img.shape)
-	plt.imshow(img, cmap="gray") # Import the image
-	plt.show()
-	image=img.reshape(-1,28,28)
-	print(image.shape)
-	modeltrain.predict(image)
+	
+	############### finding cells wwith digit  #################
+
+	while(i<no_cells_height):
+		while(j<no_cells_width):
+			m=np.mean(img[(i+1)*cell_size-cell_size+4:(i+1)*cell_size-4,(j+1)*cell_size-cell_size+4:(j+1)*cell_size-4])
+			if(m>5):
+				digitcell.append((i,j))
+			j+=1
+		j=0
+		i+=1
+
+	################### classify  digit by model ############ 
+	while d<len(digitcell):
+		(a,b)=digitcell[d]
+		d+=1
+		simg=img[(a+1)*cell_size-cell_size+4:(a+1)*cell_size-4,(b+1)*cell_size-cell_size+4:(b+1)*cell_size-4]
+
+		#plt.imshow(simg, cmap="gray") # Import the image
+		#plt.show()
+		simg=cv2.resize(simg,(28,28),interpolation=cv2.INTER_AREA)
+	
+		threshold,simg=cv2.threshold(simg,120,255,cv2.THRESH_BINARY)
+		simg = tf.keras.utils.normalize(simg, axis=1)
+		#plt.imshow(simg, cmap="gray") # Import the image
+		#plt.show()
+		#print(simg.shape)
+		image=simg.reshape(-1,28,28,1)
+		digit=(Load_Model.predict(image))
+		#print(digit,d)
+		digitvalue[(a,b)]=digit
+	#print(digitvalue)
+	###################3 DIGIT LIST READY #########################
+	for x in digitvalue.values():
+		digits_list.append(int(x))	
+	#print(digits_list)
+	#print(digitcell)
+	############## FINDING CELLS NEAR SHORTEST PATH ########
+	while(check<len(digitcell)):
+		(h,w)=digitcell[check]
+		check+=1
+		if incw(img)==1:
+			#print("y1")
+			w+=1
+			if search(h,w,shortestPath)==1:
+				#print("yrrr")
+				cellon_path.append((h,w-1))
+			w-=1
+		if decw(img)==1:
+			#print("y2")
+			w-=1
+			if search(h,w,shortestPath)==1:
+				#print("yrrr")
+				cellon_path.append((h,w+1))
+			w+=1
+		if inch(img)==1:
+			#print("y3")
+			h+=1
+			if search(h,w,shortestPath)==1 :
+				#print("yrrr")
+				cellon_path.append((h-1,w))
+			h-=1
+		if dech(img)==1:
+			#print("y4")
+			h-=1
+			if search(h,w,shortestPath)==1:
+				#print("yrrr")
+				cellon_path.append((h+1,w))
+			h+=1
+		
+	#print(cellon_path)
+
+
+	############## GETTING READY DIGITS ON PATH	############
+
+	z=0
+	while z<len(cellon_path):
+		item=cellon_path[z]
+		value=findValue(item)
+		
+		if value!=0:
+			digits_on_path.append(int(value))
+		z+=1
+
+
+
+
+	############ SUM OF DIGIT NEAR SHORTEST PATH ############
+	
+	sum_of_digits_on_path=int(sum(digits_on_path))
 	
 	###################################################
 
@@ -104,6 +199,51 @@ def computeSum(img_file_path, shortestPath):
 #############	You can add other helper functions here		#############
 
 
+########## check width is increaseble OR there is a wall #############
+def incw(img) :
+	x=np.mean(img[(h+1)*cell_size-cell_size:(h+1)*cell_size,(w+1)*cell_size-2:(w+1)*cell_size])  # w inc
+	if x>100:
+		return 0
+	else :
+		return 1
+    
+        	
+################# check width of maze is decreasable OR there is a wall #################
+def decw (img):
+    x=np.mean(img[(h+1)*cell_size-cell_size:(h+1)*cell_size,(w+1)*cell_size-cell_size:(w+1)*cell_size-(cell_size-2)]) #w dec
+    if x>100:
+        return 0
+    else :
+        return 1
+	
+################### check hieght of maze is increasable OR there is a wall ##############
+def inch (img):
+    x=np.mean(img[(h+1)*cell_size-2:(h+1)*cell_size,(w+1)*cell_size-cell_size:(w+1)*cell_size]) #h inc
+    if x>100:
+        return 0
+    else :
+        return 1 
+############### check hieght of maze is decreasable OR there is a wall ##################3
+def dech (img):
+    x=np.mean(img[(h+1)*cell_size-cell_size:(h+1)*cell_size-(cell_size-2),(w+1)*cell_size-cell_size:(w+1)*cell_size]) #h decc
+    if x>100:
+        return 0
+    else :
+        return 1
+############# search cell in shortest path ##########
+def search(h,w,shortestPath):
+	for i in range(len(shortestPath)):
+		if shortestPath[i]==(h,w):
+			return 1
+	return 0
+
+########### find value in cells on path ############
+
+def findValue(item):
+    for key,value in digitvalue.items():
+        if item==key :
+            return value
+    return 0
 
 #########################################################################
 
