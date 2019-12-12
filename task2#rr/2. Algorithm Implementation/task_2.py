@@ -19,7 +19,7 @@
 '''
 
 
-# Team ID:			[ Team-ID ]
+# Team ID:			[ 4695 ]
 # Author List:		[ Names of team members worked on this file separated by Comma: Name1, Name2, ... ]
 # Filename:			task_2.py
 # Functions:		findCombination
@@ -62,13 +62,55 @@ def findCombination(Digits_list, Sum_integer):
     combination_of_digits = []
 
     #############	Add your Code here	###############
-    
+    '''
+    print (type(Digits_list))
+    print (type(Sum_integer))
+    '''
+    ########## checking liast to find solutuiion in two numbers combination ###########
+    i=0
+    k=len(Digits_list)
+    while i <k-1:
+        j=i+1
+        while j<k:
+            if Sum_integer==Digits_list[i]+Digits_list[j]:
+                combination_of_digits.append(Digits_list[i])
+                combination_of_digits.append(Digits_list[j])
+                break
+            j+=1
+        if len(combination_of_digits)!=0:
+            break
+        i+=1
+
+
+    ########## if not then check in three combinations ###############
+    if len(combination_of_digits)==0:
+        x=0
+        while x<k-2:
+            y=x+1
+            while y<k-1:
+                z=y+1
+                while z<k:
+                    if Sum_integer==Digits_list[x]+Digits_list[y]+Digits_list[z]:
+                        combination_of_digits.append(Digits_list[x])
+                        combination_of_digits.append(Digits_list[y])
+                        combination_of_digits.append(Digits_list[z])
+                        break
+                    z+=1
+                if len(combination_of_digits)!=0:
+                    break
+                y+=1
+            if len(combination_of_digits)!=0:
+                break
+            x+=1
+            
+
+
     
 
     ###################################################
 
     return combination_of_digits
-
+    
 
 #############	You can add other helper functions here		#############
 
