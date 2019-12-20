@@ -100,14 +100,77 @@ def findCombination(Digits_list, Sum_integer):
                     break
                 y+=1
             if len(combination_of_digits)!=0:
-                break
+                    break
             x+=1
-            
+    
+    ################## if combination is more than 3 digits ###########
+    if len(combination_of_digits)==0:
+        a=0
+        while a<k-3:
+            x=a+1
+            while x<k-2:
+                y=x+1
+                while y<k-1:
+                    z=y+1
+                    while z<k:
+                        if Sum_integer==Digits_list[x]+Digits_list[y]+Digits_list[z]+Digits_list[a]:
+                            combination_of_digits.append(Digits_list[a])
+                            combination_of_digits.append(Digits_list[x])
+                            combination_of_digits.append(Digits_list[y])
+                            combination_of_digits.append(Digits_list[z])
+                            
+                            break
+                        z+=1
+                    if len(combination_of_digits)!=0:
+                        break
+                    y+=1
+                if len(combination_of_digits)!=0:
+                    break
+                x+=1
+            if len(combination_of_digits)!=0:
+                break
+            a+=1
 
+
+
+
+    #############  if combination are more than 4 digits ###########
+    if len(combination_of_digits)==0:
+        b=0
+        while b<k-4:
+            a=b+1
+            while a<k-3:
+                x=a+1
+                while x<k-2:
+                    y=x+1
+                    while y<k-1:
+                        z=y+1
+                        while z<k:
+                            if Sum_integer==Digits_list[x]+Digits_list[y]+Digits_list[z]+Digits_list[a]+Digits_list[b]:
+                                combination_of_digits.append(Digits_list[b])
+                                combination_of_digits.append(Digits_list[a])
+                                combination_of_digits.append(Digits_list[x])
+                                combination_of_digits.append(Digits_list[y])
+                                combination_of_digits.append(Digits_list[z])
+                                
+                                
+                                break
+                            z+=1
+                        if len(combination_of_digits)!=0:
+                            break
+                        y+=1
+                    if len(combination_of_digits)!=0:
+                        break
+                    x+=1
+                if len(combination_of_digits)!=0:
+                    break
+                a+=1
+            if len(combination_of_digits)!=0:
+                break
+            b+=1
 
     
-
-    ###################################################
+###################################################
 
     return combination_of_digits
     
